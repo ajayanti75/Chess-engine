@@ -24,9 +24,13 @@ def main():
     gs = ChessEngine.GameState()
     loadImages()
     running = True
-    clock.tick(MAX_FPS)
-    drawGameState(screen, gs)
-    p.display.flip()
+    while running:
+        for e in p.event.get():
+            if e.type == p.QUIT:
+                running = False
+        drawGameState(screen, gs)
+        clock.tick(MAX_FPS)
+        p.display.flip()
 
 
 def drawBoard(screen):
