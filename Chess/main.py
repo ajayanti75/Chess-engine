@@ -5,7 +5,7 @@ import ChessEngine
 WIDTH = HEIGHT = 512
 DIMENSION = 8
 SQ_SIZE = HEIGHT // DIMENSION
-MAX_FPS = 20
+MAX_FPS = 15
 IMAGES = {}
 
 
@@ -26,27 +26,28 @@ def main():
     running = True
     clock.tick(MAX_FPS)
     p.display.flip()
+    drawGameState(screen, gs)
 
 
 def drawBoard(screen):
-    colors = [p.color("white"), p.color("gray")]
+    colors = [p.Color("white"), p.Color("gray")]
     for r in range(DIMENSION):
         for c in range(DIMENSION):
             color = colors[((r + c) % 2)]
-            p.draw.rect(screen, color, p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+            p.draw.rect(screen, color, p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 
 def drawPieces(screen, board):
     for r in range(DIMENSION):
         for c in range(DIMENSION):
             piece = board[r][c]
-            if piece != '--':
+            if piece != "--":
                 screen.blit(IMAGES[piece], p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 
 def drawGameState(screen, gs):
     drawBoard(screen)
-    drawPieces(screen, gs.board)
+    # drawPieces(screen, gs.board)
 
 
 if __name__ == '__main__':
