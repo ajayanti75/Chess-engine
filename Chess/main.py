@@ -25,8 +25,8 @@ def main():
     loadImages()
     running = True
     clock.tick(MAX_FPS)
-    p.display.flip()
     drawGameState(screen, gs)
+    p.display.flip()
 
 
 def drawBoard(screen):
@@ -47,7 +47,7 @@ def drawPieces(screen, board):
 
 def drawGameState(screen, gs):
     drawBoard(screen)
-    # drawPieces(screen, gs.board)
+    drawPieces(screen, gs.board)
 
 
 if __name__ == '__main__':
