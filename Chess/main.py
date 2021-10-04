@@ -22,6 +22,8 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     gs = ChessEngine.GameState()
+    valid_moves = gs.getValidMoves()
+    move_made = False
     loadImages()
     running = True
     current_sq = ()
@@ -30,6 +32,7 @@ def main():
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
+            # mouse handler
             elif e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos()
                 col = location[0] // SQ_SIZE
@@ -42,9 +45,19 @@ def main():
                     player_clicks.append(current_sq)
                 if len(player_clicks) == 2:
                     move = ChessEngine.Move(player_clicks[0], player_clicks[1], gs.board)
-                    gs.makeMove(move)
-                    current_sq = () #reset move
+                    if move in valid_moves:
+                        gs.makeMove(move)
+                        move_made = True
+                    current_sq = ()  # reset move
                     player_clicks = []
+                # key handler
+            elif e.type == p.KEYDOWN:
+                if e.key == p.K_z:  # undo when z is pressed
+                    gs.undoMove()  # possible improvement is storing undone move and being able to redo it
+                    move_made = False
+        if move_made:
+            valid_moves = gs.getValidMoves()
+            move_made = False
         drawGameState(screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
