@@ -45,16 +45,19 @@ def main():
                     player_clicks.append(current_sq)
                 if len(player_clicks) == 2:
                     move = ChessEngine.Move(player_clicks[0], player_clicks[1], gs.board)
+                    print(move.getChessNotation())
                     if move in valid_moves:
                         gs.makeMove(move)
                         move_made = True
-                    current_sq = ()  # reset move
-                    player_clicks = []
+                        current_sq = ()  # reset move
+                        player_clicks = []
+                    else:
+                        player_clicks = [current_sq]
                 # key handler
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z:  # undo when z is pressed
                     gs.undoMove()  # possible improvement is storing undone move and being able to redo it
-                    move_made = False
+                    move_made = True
         if move_made:
             valid_moves = gs.getValidMoves()
             move_made = False
