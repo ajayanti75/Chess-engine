@@ -16,9 +16,9 @@ class GameState:
                     elif c == 2 or c == 5:
                         self.board[r, c] = 'bB'
                     elif c == 3:
-                        self.board[r, c] = 'bK'
-                    else:
                         self.board[r, c] = 'bQ'
+                    else:
+                        self.board[r, c] = 'bK'
                 elif r == 1:
                     self.board[r, c] = 'bp'
                 elif r == 6:
@@ -31,9 +31,9 @@ class GameState:
                     elif c == 2 or c == 5:
                         self.board[r, c] = 'wB'
                     elif c == 3:
-                        self.board[r, c] = 'wK'
-                    else:
                         self.board[r, c] = 'wQ'
+                    else:
+                        self.board[r, c] = 'wK'
                 else:
                     self.board[r, c] = '--'
         self.moveFunctions = {'p': self.getPawnMoves, 'R': self.getRookMoves, 'N': self.getKnightMoves,
@@ -73,7 +73,6 @@ class GameState:
     def getValidMoves(self):
         moves = []
         self.in_check, self.pins, self.checks = self.checkForPinsAndChecks()
-        print(self.in_check)
         if self.whiteToMove:
             kingRow = self.whiteKingLocation[0]
             kingCol = self.whiteKingLocation[1]
