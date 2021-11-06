@@ -93,8 +93,7 @@ class GameState:
                     validSquares = [(checkRow, checkCol)]
                 else:
                     for i in range(1, 8):
-                        validSquare = (
-                        kingRow + check[2] * i, kingCol + check[3] * i)  # check[2/3] are the check directions
+                        validSquare = (kingRow + check[2] * i, kingCol + check[3] * i)  # check[2/3] are the check directions
                         validSquares.append(validSquare)
                         if validSquare[0] == checkRow and validSquare[1] == checkCol:
                             break
@@ -294,7 +293,7 @@ class GameState:
             ally_color = 'b'
             startRow = self.blackKingLocation[0]
             startCol = self.blackKingLocation[1]
-        directions = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 1), (1, -0))
+        directions = ((-1, 0), (0, -1), (1, 0), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1))
         for j in range(len(directions)):
             d = directions[j]
             possiblePin = ()
