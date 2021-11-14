@@ -1,6 +1,6 @@
 # driver file that handles user input and displays the GameState object
 import pygame as p
-import ChessEngine
+from ChessEngine import ChessEngine
 
 WIDTH = HEIGHT = 512
 DIMENSION = 8
