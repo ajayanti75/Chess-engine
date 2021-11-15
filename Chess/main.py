@@ -1,6 +1,7 @@
 # driver file that handles user input and displays the GameState object
 import pygame as p
 from ChessEngine import ChessEngine
+from ChessEngine import AI
 
 WIDTH = HEIGHT = 512
 DIMENSION = 8
@@ -30,13 +31,16 @@ def main():
     current_sq = ()
     player_clicks = []
     gameOver = False
+    playerOne = True  # True if a human is playing white
+    playerTwo = False  # True if a human is playing black
     while running:
+        humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
             # mouse handler
             elif e.type == p.MOUSEBUTTONDOWN:
-                if not gameOver:
+                if not gameOver and humanTurn:
                     location = p.mouse.get_pos()
                     col = location[0] // SQ_SIZE
                     row = location[1] // SQ_SIZE
@@ -71,6 +75,12 @@ def main():
                     player_clicks = []
                     move_made = False
                     animate = False
+        #AI move finder
+        if not gameOver and not humanTurn:
+            AIMove = AI.findRandomMove(valid_moves)
+            gs.makeMove(AIMove)
+            move_made = True
+            animate = True
         if move_made:
             if animate:
                 animateMove(gs.moveLog[-1], screen, gs.board, clock)
@@ -136,9 +146,9 @@ def animateMove(move, screen, board, clock):
     global colors
     d_row = move.endRow - move.startRow
     d_col = move.endCol - move.startCol
-    frames_per_square = 16  # frames to move one square
+    frames_per_square = 10  # frames to move one square
     frame_count = (abs(d_row) + abs(d_col)) * frames_per_square
-    for frame in range(frame_count + 4):
+    for frame in range(frame_count + 5):
         row, col = (move.startRow + d_row * frame / frame_count, move.startCol + d_col * frame / frame_count)
         drawBoard(screen)
         drawPieces(screen, board)
@@ -158,7 +168,7 @@ def animateMove(move, screen, board, clock):
         clock.tick(60)
 
 
-def drawEndGameText(screen, text):
+def drawText(screen, text):
     font = p.font.SysFont("Helvetica", 32, True, False)
     text_object = font.render(text, False, p.Color("black"))
     text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH / 2 - text_object.get_width() / 2,
