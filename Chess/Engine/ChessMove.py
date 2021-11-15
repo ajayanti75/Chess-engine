@@ -22,6 +22,7 @@ class Move:
         if self.isEnpassantMove:
             self.pieceCaptured = 'wp' if self.pieceMoved == 'bp' else 'bp'
         self.is_castle_move = is_castle_move
+        self.is_capture = self.pieceCaptured != "--"
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
 
     def __eq__(self, other):
@@ -34,3 +35,20 @@ class Move:
 
     def getRankFile(self, r, c):
         return self.cols_to_files[c] + self.rows_to_ranks[r]
+
+    def __str__(self):
+        if self.is_castle_move:
+            return "0-0" if self.endCol == 6 else "0-0-0"
+
+        end_square = self.getRankFile(self.endRow, self.endCol)
+
+        if self.pieceMoved[1] == "p":
+            if self.is_capture:
+                return self.cols_to_files[self.startCol] + "x" + end_square
+            else:
+                return end_square + "Q" if self.isPawnPromotion else end_square
+
+        move_string = self.pieceMoved[1]
+        if self.is_capture:
+            move_string += "x"
+        return move_string + end_square
