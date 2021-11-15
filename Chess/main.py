@@ -1,7 +1,8 @@
 # driver file that handles user input and displays the GameState object
 import pygame as p
-from ChessEngine import ChessEngine
-from ChessEngine import AI
+from Engine import ChessEngine
+from Engine import AI
+from Engine import ChessMove
 
 WIDTH = HEIGHT = 512
 DIMENSION = 8
@@ -51,7 +52,7 @@ def main():
                         current_sq = (row, col)
                         player_clicks.append(current_sq)
                     if len(player_clicks) == 2:
-                        move = ChessEngine.Move(player_clicks[0], player_clicks[1], gs.board)
+                        move = ChessMove.Move(player_clicks[0], player_clicks[1], gs.board)
                         print(move.getChessNotation())
                         for i in range(len(valid_moves)):
                             if move == valid_moves[i]:
