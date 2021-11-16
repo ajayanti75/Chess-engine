@@ -251,51 +251,75 @@ class GameState:
                 pin_direction = (self.pins[i][2], self.pins[i][3])
                 self.pins.remove(self.pins[i])
                 break
-        if self.whiteToMove:  # white pawn moves
-            if self.board[r - 1][c] == '--':  # forward
-                if not piece_pinned or pin_direction == (-1, 0):
-                    moves.append(ChessMove.Move((r, c), (r - 1, c), self.board))
-                    if r == 6 and self.board[r - 2][c] == '--':
-                        moves.append(ChessMove.Move((r, c), (r - 2, c), self.board))
 
-            if c - 1 >= 0:  # left capture
-                if self.board[r - 1][c - 1][0] == 'b':
-                    if not piece_pinned or pin_direction == (-1, -1):
-                        moves.append(ChessMove.Move((r, c), (r - 1, c - 1), self.board))
-                elif (r - 1, c - 1) == self.enpassantPossible:
-                    if not piece_pinned or pin_direction == (-1, -1):
-                        moves.append(ChessMove.Move((r, c), (r - 1, c - 1), self.board, is_enpassant_move=True))
+        if self.whiteToMove:
+            move_amount = -1
+            start_row = 6
+            enemy_color = "b"
+            king_row, king_col = self.whiteKingLocation
+        else:
+            move_amount = 1
+            start_row = 1
+            enemy_color = "w"
+            king_row, king_col = self.blackKingLocation
 
-            if c + 1 <= 7:  # right capture
-                if self.board[r - 1][c + 1][0] == 'b':
-                    if not piece_pinned or pin_direction == (-1, 1):
-                        moves.append(ChessMove.Move((r, c), (r - 1, c + 1), self.board))
-                elif (r - 1, c + 1) == self.enpassantPossible:
-                    if not piece_pinned or pin_direction == (-1, 1):
-                        moves.append(ChessMove.Move((r, c), (r - 1, c + 1), self.board, is_enpassant_move=True))
-
-        else:  # black pawn moves
-            if self.board[r + 1][c] == '--':  # forward
-                if not piece_pinned or pin_direction == (1, 0):
-                    moves.append(ChessMove.Move((r, c), (r + 1, c), self.board))
-                    if r == 1 and self.board[r + 2][c] == '--':
-                        moves.append(ChessMove.Move((r, c), (r + 2, c), self.board))
-
-            if c - 1 >= 0:  # left capture
-                if self.board[r + 1][c - 1][0] == 'w':
-                    if not piece_pinned or pin_direction == (1, -1):
-                        moves.append(ChessMove.Move((r, c), (r + 1, c - 1), self.board))
-                elif (r + 1, c - 1) == self.enpassantPossible:
-                    if not piece_pinned or pin_direction == (1, -1):
-                        moves.append(ChessMove.Move((r, c), (r + 1, c - 1), self.board, is_enpassant_move=True))
-
-            if c + 1 <= 7:  # right capture
-                if self.board[r + 1][c + 1][0] == 'w':
-                    if not piece_pinned or pin_direction == (1, 1):
-                        moves.append(ChessMove.Move((r, c), (r + 1, c + 1), self.board))
-                elif (r + 1, c + 1) == self.enpassantPossible:
-                    if not piece_pinned or pin_direction == (1, 1):
-                        moves.append(ChessMove.Move((r, c), (r + 1, c + 1), self.board, is_enpassant_move=True))
+        if self.board[r + move_amount][c] == "--":  # 1 square pawn advance
+            if not piece_pinned or pin_direction == (move_amount, 0):
+                moves.append(ChessMove.Move((r, c), (r + move_amount, c), self.board))
+                if r == start_row and self.board[r + 2 * move_amount][c] == "--":  # 2 square pawn advance
+                    moves.append(ChessMove.Move((r, c), (r + 2 * move_amount, c), self.board))
+        if c - 1 >= 0:  # capture to the left
+            if not piece_pinned or pin_direction == (move_amount, -1):
+                if self.board[r + move_amount][c - 1][0] == enemy_color:
+                    moves.append(ChessMove.Move((r, c), (r + move_amount, c - 1), self.board))
+                if (r + move_amount, c - 1) == self.enpassantPossible:
+                    attacking_piece = blocking_piece = False
+                    if king_row == r:
+                        if king_col < c:  # king is left of the pawn
+                            # inside: between king and the pawn;
+                            # outside: between pawn and border;
+                            inside_range = range(king_col + 1, c - 1)
+                            outside_range = range(c + 1, 8)
+                        else:  # king right of the pawn
+                            inside_range = range(king_col - 1, c, -1)
+                            outside_range = range(c - 2, -1, -1)
+                        for i in inside_range:
+                            if self.board[r][i] != "--":  # some piece beside en-passant pawn blocks
+                                blocking_piece = True
+                        for i in outside_range:
+                            square = self.board[r][i]
+                            if square[0] == enemy_color and (square[1] == "R" or square[1] == "Q"):
+                                attacking_piece = True
+                            elif square != "--":
+                                blocking_piece = True
+                    if not attacking_piece or blocking_piece:
+                        moves.append(ChessMove.Move((r, c), (r + move_amount, c - 1), self.board, is_enpassant_move=True))
+        if c + 1 <= 7:  # capture to the right
+            if not piece_pinned or pin_direction == (move_amount, +1):
+                if self.board[r + move_amount][c + 1][0] == enemy_color:
+                    moves.append(ChessMove.Move((r, c), (r + move_amount, c+ 1), self.board))
+                if (r + move_amount, c + 1) == self.enpassantPossible:
+                    attacking_piece = blocking_piece = False
+                    if king_row == r:
+                        if king_col < c:  # king is left of the pawn
+                            # inside: between king and the pawn;
+                            # outside: between pawn and border;
+                            inside_range = range(king_col + 1, c)
+                            outside_range = range(c + 2, 8)
+                        else:  # king right of the pawn
+                            inside_range = range(king_col - 1, c + 1, -1)
+                            outside_range = range(c - 1, -1, -1)
+                        for i in inside_range:
+                            if self.board[r][i] != "--":  # some piece beside en-passant pawn blocks
+                                blocking_piece = True
+                        for i in outside_range:
+                            square = self.board[r][i]
+                            if square[0] == enemy_color and (square[1] == "R" or square[1] == "Q"):
+                                attacking_piece = True
+                            elif square != "--":
+                                blocking_piece = True
+                    if not attacking_piece or blocking_piece:
+                        moves.append(ChessMove.Move((r, c), (r + move_amount, c + 1), self.board, is_enpassant_move=True))
 
     def getRookMoves(self, r, c, moves):
         piece_pinned = False
