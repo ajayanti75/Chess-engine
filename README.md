@@ -1,6 +1,6 @@
 # Chess-engine
 A chess engine that defines all the rules and mechanics of chess, **generates all valid moves** and then uses negamax recursion combined with alpha beta pruning to choose the best move, upto a customizable depth.
-I have been playing chess for a while, and wanted to improve my python skills so I thought of building a chess engine, and came across an exceptional [tutorial](URL "https://www.youtube.com/channel/UCaEohRz5bPHywGBwmR18Qww"), by Eddie Sharick. The codebase is inspired by his tutorials, combined by my own improvements.
+I have been playing chess for a while, and wanted to improve my python skills so I thought of building a chess engine, and came across an exceptional [tutorial](URL 'https://www.youtube.com/watch?v=EnYui0e73Rs&ab_channel=EddieSharick' ), by Eddie Sharick. The codebase is inspired by his tutorials, combined by my own improvements.
 
 # Instructions
 Clone this repository.
