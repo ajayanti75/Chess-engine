@@ -3,6 +3,7 @@ import pygame as p
 from Engine import ChessEngine
 from Engine import AI
 from Engine import ChessMove
+from multiprocessing import Process, Queue
 
 WIDTH = HEIGHT = 512
 MOVE_LOG_PANEL_WIDTH = 250
@@ -36,7 +37,10 @@ def main():
     gameOver = False
     moveLogFont = p.font.SysFont("Calibri", 12, False, False)
     playerOne = True  # True if a human is playing white
-    playerTwo = True  # True if a human is playing black
+    playerTwo = False  # True if a human is playing black
+    AIThinking = False
+    move_finder_process = None
+    move_undone = False
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
         for e in p.event.get():
@@ -73,6 +77,10 @@ def main():
                     move_made = True
                     animate = False
                     gameOver = False
+                    if AIThinking:
+                        move_finder_process.terminate()
+                        AIThinking = False
+                    move_undone = True
                 if e.key == p.K_r:  # reset when r is pressed
                     gs = ChessEngine.GameState()
                     valid_moves = gs.getValidMoves()
@@ -81,12 +89,25 @@ def main():
                     move_made = False
                     animate = False
                     gameOver = False
+                    if AIThinking:
+                        move_finder_process.terminate()
+                        AIThinking = False
+                    move_undone = True
         #AI move finder
-        if not gameOver and not humanTurn:
-            AIMove = AI.findBestMove(gs, valid_moves)
-            gs.makeMove(AIMove)
-            move_made = True
-            animate = True
+        if not gameOver and not humanTurn and not move_undone:
+            if not AIThinking:
+                AIThinking = True
+                returnQueue = Queue()  #used to pass data between threads
+                move_finder_process = Process(target=AI.findBestMove, args=(gs, valid_moves, returnQueue))
+                move_finder_process.start()
+            if not move_finder_process.is_alive():
+                AIMove = returnQueue.get()
+                if AIMove is None:
+                    AIMove = AI.findRandomMove()
+                gs.makeMove(AIMove)
+                move_made = True
+                animate = True
+                AIThinking = False
         if move_made:
             if animate:
                 animateMove(gs.moveLog[-1], screen, gs.board, clock)
