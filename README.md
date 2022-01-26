@@ -12,5 +12,7 @@ Additional gameplay: Press Z to undo a move, and R to reset the game
 
 # Future improvements
 Code cleanup and refactoring
+
 Improved UI
+
 Improve engine speed by implementing : move ordering, keeping track of all possible moves, teaching engine standard openings
